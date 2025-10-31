@@ -1,0 +1,62 @@
+# -------------------------------
+# Experiment 5: PCA with Heart Dataset
+# -------------------------------
+
+# Step 1: Import necessary libraries
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
+# Step 2: Load the dataset
+# (Replace 'heart.csv' with your actual dataset file name)
+data = pd.read_csv("heart.csv")
+
+# Display first 5 rows
+print("Sample data:\n", data.head())
+
+# Step 3: Separate features (X) and target (y)
+X = data.drop('target', axis=1)     # all columns except target
+y = data['target']                  # target column (0 = No Disease, 1 = Disease)
+
+# Step 4: Standardize the data
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Step 5: Apply PCA (reduce to 2 principal components)
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+# Step 6: Create a new DataFrame with PCA results
+pca_df = pd.DataFrame(data=X_pca, columns=['PC1', 'PC2'])
+pca_df['target'] = y
+
+print("\nExplained Variance Ratio:", pca.explained_variance_ratio_)
+
+# Step 7: Visualize the PCA result
+plt.figure(figsize=(8,6))
+colors = ['red', 'green']
+labels = ['No Disease', 'Disease']
+
+for i, color, label in zip([0, 1], colors, labels):
+    plt.scatter(
+        pca_df.loc[pca_df['target'] == i, 'PC1'],
+        pca_df.loc[pca_df['target'] == i, 'PC2'],
+        color=color, label=label
+    )
+
+plt.title('PCA - Heart Disease Dataset')
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Step 8: Save the PCA result to a CSV file
+pca_df.to_csv('heart_pca.csv', index=False)
+print("\nPCA transformed data saved to 'heart_pca.csv'")
+
+# -------------------------------
+# END OF PROGRAM
+# -------------------------------
